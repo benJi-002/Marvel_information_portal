@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-
+import {CSSTransition, TransitionGroup} from 'react-transition-group';
 
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import useMarvelService from '../../services/MarvelService';
+
 import './comicsList.scss';
 
 const ComicsList = (props) => {
@@ -62,36 +63,38 @@ const ComicsList = (props) => {
             }
             
             return (
-
-                <li 
-                    className="comics__item"
-                    tabIndex={0}
-                    key={i}
-                    ref={el => itemRefs.current[i] = el}
-                    onClick={() => {
-                        props.onComicsSelected(item.id);
-                        focusOnItem(i);
-                    }}
-                    onKeyPress={(e) => {
-                        if (e.key === ' ' || e.key === "Enter") {
+                <CSSTransition key={item.id} timeout={500} classNames="comics__item">
+                    <li 
+                        className="comics__item"
+                        tabIndex={0}
+                        key={i}
+                        ref={el => itemRefs.current[i] = el}
+                        onClick={() => {
                             props.onComicsSelected(item.id);
                             focusOnItem(i);
-                        }
-                    }}
-                >
-                    <Link to={`/comics/${item.id}`}>
-                        <img className="comics__item-img" src={item.thumbnail} alt={item.name} style={imgStyle}/>
-                        <div className="comics__item-name">{item.name}</div>
-                        <div className="comics__item-price">{item.price}</div>
-                    </Link>
-                </li>
-
+                        }}
+                        onKeyPress={(e) => {
+                            if (e.key === ' ' || e.key === "Enter") {
+                                props.onComicsSelected(item.id);
+                                focusOnItem(i);
+                            }
+                        }}
+                    >
+                        <Link to={`/comics/${item.id}`}>
+                            <img className="comics__item-img" src={item.thumbnail} alt={item.name} style={imgStyle}/>
+                            <div className="comics__item-name">{item.name}</div>
+                            <div className="comics__item-price">{item.price}</div>
+                        </Link>
+                    </li>
+                </CSSTransition>
             )
         });
         // А эта конструкция вынесена для центровки спиннера/ошибки
         return (
             <ul className="comics__grid">
-                {items}
+                <TransitionGroup component={null}>
+                    {items}
+                </TransitionGroup>
             </ul>
         )
     }
